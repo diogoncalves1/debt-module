@@ -14,6 +14,11 @@ class SharedPermissionRole extends Model
     protected $fillable = ['shared_role_id', 'shared_permission_id'];
     public $timestamps = false;
 
+    protected static function newFactory()
+    {
+        return \Modules\SharedRoles\Database\Factories\SharedPermissionRoleFactory::new();
+    }
+
     public function role()
     {
         return $this->belongsTo(SharedRole::class);

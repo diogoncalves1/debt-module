@@ -2,11 +2,13 @@
 
 namespace Modules\SharedRoles\Http\Controllers\Api;
 
-use App\Http\Controllers\AppController;
+use App\Http\Controllers\ApiController;
+use Illuminate\Http\JsonResponse;
 use Modules\SharedRoles\Repositories\SharedPermissionRepository;
 use Illuminate\Http\Request;
+use Modules\SharedRoles\DataTables\SharedPermissionDataTable;
 
-class SharedPermissionController extends AppController
+class SharedPermissionController extends ApiController
 {
     private SharedPermissionRepository $sharedPermissionRepository;
 
@@ -15,35 +17,30 @@ class SharedPermissionController extends AppController
         $this->sharedPermissionRepository = $sharedPermissionRepository;
     }
 
-    public function dataTable(Request $request)
+    public function index(SharedPermissionDataTable $dataTable)
     {
-        // $this->allowedAction('getAdminSharedPermissions');
-
-        $response = $this->sharedPermissionRepository->dataTable($request);
-
-        return $response;
+        try {
+            return $dataTable->ajax();
+        } catch (\Exception $e) {
+            return $this->fail($e->getMessage(), $e, $e->getCode());
+        }
     }
 
-    public function checkPermissionCode(Request $request)
+    public function checkPermissionCode(Request $request): JsonResponse
     {
-        // $this->allowedAction('getAdminSharedPermissions');
+        try {
+            $this->allowedAction('viewSharedPermission');
 
-        $request->validate([
-            "id" => "nullable",
-            "code" => "required|string|max:100",
-        ]);
+            $request->validate([
+                "id" => "nullable",
+                "code" => "required|string|max:100",
+            ]);
 
-        $response = $this->sharedPermissionRepository->checkPermissionCode($request);
+            $exists = $this->sharedPermissionRepository->checkPermissionCode($request);
 
-        return $response;
-    }
-
-    public function destroy(string $id)
-    {
-        // $this->allowedAction('deleteSharedPermissions');
-
-        $response = $this->sharedPermissionRepository->destroy($id);
-
-        return $response;
+            return $this->ok(additionals: ['exists' => $exists]);
+        } catch (\Exception $e) {
+            return $this->fail('', $e, 500);
+        }
     }
 }

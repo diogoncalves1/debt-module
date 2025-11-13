@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin | Papel de Partilha ')
+@section('title', 'Modulo Papel de Partilha | ' . (isset($sharedRole) ? 'Editar' : 'Adicionar') . ' Papel de Partilha')
 
 @section('breadcrumb')
 <li class="breadcrumb-item"><a class="text-white" href="{{ route('admin.shared-roles.index') }}">Papeis de partilha</a></li>
@@ -13,7 +13,7 @@
         @csrf
         @if(isset($sharedRole))
         @method('PUT')
-        <input type="hidden" name="shared_role_id" value="{{ $sharedRole->id }}">
+        <input type="hidden" name="shared_role_id" id="sharedRoleId" value="{{ $sharedRole->id }}">
         @else
         @method('POST')
         @endif
@@ -47,7 +47,7 @@
                             @foreach($languages as $key => $language)
                             <li class="nav-item">
                                 <a @class(['nav-link', "active"=> $key == 0 ])
-                                    href="#{{ $language->name }}" data-toggle="tab">{{ $language->value; }}</a>
+                                    href="#{{ $language }}" data-toggle="tab">{{ strtoupper($language) }}</a>
                             </li>
                             @endforeach
                         </ul>
@@ -55,13 +55,13 @@
                     <div class="card-body">
                         <div class="tab-content">
                             @foreach($languages as $key => $language)
-                            <div @class(['tab-pane', "active"=> $key == 0 ]) id="{{ $language->name }}">
+                            <div @class(['tab-pane', "active"=> $key == 0 ]) id="{{ $language }}">
                                 <div class="form-group">
-                                    <label for="inputDisplayName">Nome em {{ $language->value }}
+                                    <label for="inputDisplayName">Nome em {{ strtoupper($language) }}
                                         <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" value="{{ isset($sharedRole) ? json_decode($sharedRole->name)->{$language->name} : '' }}"
-                                        name="name[{{ $language->name }}]" class="validate form-control" required>
+                                    <input type="text" value="{{ isset($sharedRole) ? $sharedRole->name->{$language} ?? '' : '' }}"
+                                        name="name[{{ $language }}]" class="validate form-control" required>
                                     <span class="error invalid-feedback">Preencha este
                                         campo</span>
                                     <span class="success valid-feedback">Campo preenchido</span>

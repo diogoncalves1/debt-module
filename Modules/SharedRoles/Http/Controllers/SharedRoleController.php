@@ -2,67 +2,150 @@
 
 namespace Modules\SharedRoles\Http\Controllers;
 
-use Modules\SharedRoles\Enums\Language;
-use App\Http\Controllers\AppController;
+use App\Http\Controllers\ApiController;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
 use Modules\SharedRoles\Http\Requests\SharedRoleRequest;
 use Modules\SharedRoles\Repositories\SharedRoleRepository;
-use Illuminate\Support\Facades\Session;
+use Modules\SharedRoles\DataTables\SharedRoleDataTable;
+use Modules\SharedRoles\Http\Requests\SharedRolePermissionsRequest;
+use Modules\SharedRoles\Repositories\SharedPermissionRepository;
 
-class SharedRoleController extends AppController
+class SharedRoleController extends ApiController
 {
     protected SharedRoleRepository $sharedRoleRepository;
+    private SharedPermissionRepository $sharedPermissionRepository;
 
-    public function __construct(SharedRoleRepository $sharedRoleRepository)
+    public function __construct(SharedRoleRepository $sharedRoleRepository, SharedPermissionRepository $sharedPermissionRepository)
     {
         $this->sharedRoleRepository = $sharedRoleRepository;
+        $this->sharedPermissionRepository = $sharedPermissionRepository;
     }
 
-    public function index()
+    /**
+     * Display a listing of the resource.
+     *
+     * @param SharedRoleDataTable
+     * @throws AuthorizationException
+     */
+    public function index(SharedRoleDataTable $dataTable)
     {
-        // $this->allowedAction('viewSharedRoles');
+        $this->allowedAction('viewSharedRole');
 
-        Session::flash('page', "shared roles");
-
-        return view("sharedroles::shared-roles.index");
+        return $dataTable->render("sharedroles::shared-roles.index");
     }
 
-    public function create()
+    /**
+     * Show the form for create a new resource.
+     * @return Renderable
+     * @throws AuthorizationException
+     */
+    public function create(): Renderable
     {
-        // $this->allowedAction('addSharedRoles');
+        $this->allowedAction('createSharedRole');
 
-        Session::flash('page', "shared roles");
+        $languages = config('languages');
 
-        $languages = Language::cases();
-
-        return view("sharedroles::shared-roles.form", compact('languages'));
+        return view("sharedroles::shared-roles.create", compact('languages'));
     }
 
-    public function store(SharedRoleRequest $request)
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param SharedRoleRequest $request
+     * @return RedirectResponse
+     * @throws AuthorizationException
+     */
+    public function store(SharedRoleRequest $request): RedirectResponse
     {
-        // $this->allowedAction('addSharedRoles');
+        $this->allowedAction('createSharedRole');
 
         $this->sharedRoleRepository->store($request);
 
         return redirect()->route('admin.shared-roles.index');
     }
 
-    public function edit(string $id)
+    /**
+     * Show the form for edit a resource.
+     * @return Renderable
+     * @throws AuthorizationException
+     */
+    public function edit(string $id): Renderable
     {
-        // $this->allowedAction('editSharedRoles');
+        $this->allowedAction('editSharedRole');
 
-        Session::flash('page', "shared roles");
-
-        $languages = Language::cases();
+        $languages = config('languages');
         $sharedRole = $this->sharedRoleRepository->show($id);
 
-        return view("sharedroles::shared-roles.form", compact('languages', 'sharedRole'));
+        return view("sharedroles::shared-roles.create", compact('languages', 'sharedRole'));
     }
 
-    public function update(SharedRoleRequest $request, string $id)
+    /**
+     * Update the specified resource in storage.
+     * @param SharedRoleRequest $request
+     * @param string $id
+     * @return RedirectResponse
+     * @throws AuthorizationException
+     */
+    public function update(SharedRoleRequest $request, string $id): RedirectResponse
     {
-        // $this->allowedAction('updateSharedRoles');
+        $this->allowedAction('editSharedRole');
 
         $this->sharedRoleRepository->update($request, $id);
+
+        return redirect()->route('admin.shared-roles.index');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     * @param string $id
+     * @return JsonResponse
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        try {
+            $this->allowedAction('destroySharedRole');
+
+            $sharedRole = $this->sharedRoleRepository->destroy($id);
+
+            return $this->ok(message: "Papel de partilha {$sharedRole->name->en} apagado com sucesso!");
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail('Erro ao tentar apagar papel de partilha.', $e, 500);
+        }
+    }
+
+    /**
+     * Show the form for manage a resource permissions.
+     * @return Renderable
+     * @throws AuthorizationException
+     */
+    public function showManageForm(string $id): Renderable
+    {
+        $this->allowedAction('manageSharedRolePermission');
+
+        $sharedRole = $this->sharedRoleRepository->show($id);
+        $sharedPermissionsGrouped = $this->sharedPermissionRepository->allGroupedByCategory();
+
+        $SharedRolePermissionsIds = $sharedRole->permissions->pluck('id')->toArray();
+
+        return view("sharedroles::shared-roles.manage", compact('sharedPermissionsGrouped', 'SharedRolePermissionsIds', 'sharedRole'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     * @param SharedRolePermissionsRequest $request
+     * @param string $id
+     * @return RedirectResponse
+     * @throws AuthorizationException
+     */
+    public function manage(SharedRolePermissionsRequest $request, string $id): RedirectResponse
+    {
+        $this->allowedAction('manageSharedRolePermission');
+
+        $this->sharedRoleRepository->updateRolePermissions($request, $id);
 
         return redirect()->route('admin.shared-roles.index');
     }

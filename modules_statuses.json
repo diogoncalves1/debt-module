@@ -2,5 +2,6 @@
     "Accounts": true,
     "Currency": true,
     "Debts": true,
-    "Permission": true
+    "Permission": true,
+    "SharedRoles": true
 }

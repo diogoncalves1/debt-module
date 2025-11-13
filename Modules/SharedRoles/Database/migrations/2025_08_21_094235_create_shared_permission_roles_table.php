@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('shared_permission_roles', function (Blueprint $table) {
+            $table->id();
+
             $table->unsignedBigInteger('shared_role_id');
             $table->unsignedBigInteger('shared_permission_id');
+
+            $table->timestamps();
 
             $table->foreign('shared_permission_id')->references('id')->on('shared_permissions')->onDelete('cascade');
             $table->foreign('shared_role_id')->references('id')->on('shared_roles')->onDelete('cascade');

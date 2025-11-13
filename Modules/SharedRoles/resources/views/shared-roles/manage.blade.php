@@ -1,9 +1,9 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin | Gerir Permissões ')
+@section('title', 'Admin | Modulo Papel de Partilha | Gerir Permissões do Papel de Partilha')
 
 @section('css')
-<link rel="stylesheet" href="/lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+<link rel="stylesheet" href="/admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
 @endsection
 
 @section('breadcrumb')
@@ -13,7 +13,7 @@
 
 @section('content')
 <section class="content">
-    <form action="{{ route('admin.shared-roles.update-permissions', $sharedRole->id) }}" method="post">
+    <form action="{{ route('admin.shared-roles.update-permissions', $sharedRole->id) }}" class="m-3" method="post">
         @csrf
         @method('PUT')
         <div class="col-12">
@@ -21,11 +21,6 @@
                 <div class="card-header">
                     <h3 class="card-title">Permissões</h3>
 
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                    </div>
                 </div>
                 <div class="card-body">
                     @foreach($sharedPermissionsGrouped as $category => $permissions)
