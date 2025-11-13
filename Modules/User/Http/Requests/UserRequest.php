@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\User\app\Http\Requests;
+namespace Modules\User\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -24,7 +24,7 @@ class UserRequest extends FormRequest
     {
         $rules = [
             'name' => 'required|string|max:255',
-            'roles' => 'required|array|min:1'
+            'roles' => 'nullable|array'
         ];
 
         if ($this->get('user_id')) {

@@ -3,5 +3,6 @@
     "Currency": true,
     "Debts": true,
     "Permission": true,
-    "SharedRoles": true
+    "SharedRoles": true,
+    "User": true
 }
