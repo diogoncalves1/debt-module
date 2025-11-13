@@ -2,6 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -20,6 +22,31 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
+
+        $users = [
+            [
+                'name' => 'Super Admin',
+                'email' => 'geral@gmail.com',
+                'password' => Hash::make('12345678')
+            ]
+        ];
+
+        DB::table('users')->insert($users);
+
+        $permissions = [
+            ['name' => 'Ver Utilizadores', 'code' => 'viewUser', 'category' => 'Users'],
+            ['name' => 'Adicionar Utilizadores', 'code' => 'createUser', 'category' => 'Users'],
+            ['name' => 'Editar Utilizadores', 'code' => 'editUser', 'category' => 'Users'],
+            ['name' => 'Apagar Utilizadores', 'code' => 'destroyUser', 'category' => 'Users'],
+            ['name' => 'Gerir Papeis de Utilizador', 'code' => 'manageUserRoles', 'category' => 'Users'],
+        ];
+
+        foreach ($permissions as $permission) {
+            $id = DB::table('permissions')->insertGetId($permission);
+            $rolePermissions[] = ['permission_id' => $id, 'role_id' => 1];
+        }
+
+        DB::table('role_permissions')->insert($rolePermissions);
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
@@ -45,5 +72,11 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+
+        $permissions = ['viewUser', 'createUser', 'editUser', 'destroyUser'];
+
+        foreach ($permissions as $permission) {
+            DB::table('permissions')->where('code', $permission)->delete();
+        }
     }
 };

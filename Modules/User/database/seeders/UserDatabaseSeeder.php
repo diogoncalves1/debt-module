@@ -2,8 +2,9 @@
 
 namespace Modules\User\Database\Seeders;
 
-use Database\Seeders\UserSeeder;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Modules\User\Entities\User;
 
 class UserDatabaseSeeder extends Seeder
 {

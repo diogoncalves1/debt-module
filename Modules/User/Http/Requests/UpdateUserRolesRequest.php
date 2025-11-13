@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\User\app\Http\Requests;
+namespace Modules\User\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -22,7 +22,7 @@ class UpdateUserRolesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'roles' => 'required|array',
+            'roles' => 'nullable|array',
             "roles.*" => 'exists:roles,id'
         ];
     }

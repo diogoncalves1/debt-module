@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Adicionar Utilizador ')
+@section('title', 'User Module | ' . (isset($user) ? 'Editar' : 'Adicionar') . ' User')
 
 @section('breadcrumb')
 <li class="breadcrumb-item active"><a class="text-white" href="{{ route('admin.users.index') }}">Utilizadores</a>
@@ -57,10 +57,10 @@
                             <div class="col-3">
                                 <div class="form-group clearfix">
                                     <div class="icheck-success d-inline ">
-                                        <input class="form-control" type="checkbox" name="roles[]"
+                                        <input class="form-control" id="role-{{$role->id}}" type="checkbox" name="roles[]"
                                             value="{{ $role->id }}"
                                             {{ isset($userRolesIds) && in_array($role->id, $userRolesIds) ? 'checked' : '' }}>
-                                        <label><?= $role->name ?></label>
+                                        <label for="role-{{$role->id}}">{{ $role->name }}</label>
                                     </div>
                                 </div>
                             </div>
