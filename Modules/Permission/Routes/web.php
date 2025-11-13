@@ -1,11 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Permission\Http\Controllers\PermissionController;
 
 Route::group([
     "prefix" => "admin",
     "as" => "admin.",
-    // "middleware" => ["auth"]
+    "middleware" => ["auth"]
 ], function () {
     Route::group(
         [
@@ -17,8 +18,7 @@ Route::group([
             Route::post("manage/{id}", [\Modules\Permission\Http\Controllers\RoleController::class, "manage"])->name('manage.update');
         }
     );
-    Route::get('roles/data',  [\Modules\Permission\Http\Controllers\RoleController::class, 'dataTable']);
-    Route::resource("roles", \Modules\Permission\Http\Controllers\RoleController::class, ['except' => 'show']);
-    Route::get('permissions/data', [\Modules\Permission\Http\Controllers\PermissionsController::class, 'dataTable']);
-    Route::resource("permissions", \Modules\Permission\Http\Controllers\PermissionsController::class, ['except' => 'show']);
+    Route::resource("roles", \Modules\Permission\Http\Controllers\RoleController::class, ['except' => ['show']]);
+    Route::get('permissions/data', [PermissionController::class, 'dataTable']);
+    Route::resource("permissions", PermissionController::class, ['except' => ['show']]);
 });

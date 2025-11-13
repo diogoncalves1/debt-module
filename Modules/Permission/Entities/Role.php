@@ -4,7 +4,9 @@ namespace Modules\Permission\Entities;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Modules\User\Entities\User;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Role extends Model
 {
@@ -13,18 +15,21 @@ class Role extends Model
 
     protected $fillable = ["name", "code"];
 
-    public function users()
+    protected static function newFactory()
+    {
+        return \Modules\Permission\Database\Factories\RoleFactory::new();
+    }
+
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
     }
-
-    public function permissions()
+    public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(Permissions::class, 'permission_role', null, 'permission_id');
+        return $this->belongsToMany(Permission::class, 'role_permissions', null, 'permission_id');
     }
-
-    public function proles()
+    public function proles(): HasMany
     {
-        return $this->hasMany(PermissionRole::class);
+        return $this->hasMany(RolePermission::class);
     }
 }

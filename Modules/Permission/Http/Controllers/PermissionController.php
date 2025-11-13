@@ -2,13 +2,15 @@
 
 namespace Modules\Permission\Http\Controllers;
 
+use App\Http\Controllers\ApiController;
 use Modules\Permission\Http\Requests\PermissionRequest;
 use Modules\Permission\Repositories\PermissionRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
-use App\Http\Controllers\AppController;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Modules\Permission\DataTables\PermissionDataTable;
 
-class PermissionsController extends AppController
+class PermissionController extends ApiController
 {
     private $permissionRepository;
 
@@ -17,25 +19,23 @@ class PermissionsController extends AppController
         $this->permissionRepository = $permissionRepository;
     }
 
-    public function index()
+    public function index(PermissionDataTable $dataTable)
     {
-        // $this->allowedAction('viewPermissions');
-        Session::flash('page', 'permissions');
+        $this->allowedAction('superAdmin');
 
-        return view('permission::permissions.index');
+        return $dataTable->render('permission::permissions.index');
     }
 
     public function create()
     {
-        // $this->allowedAction('addPermission');
-        Session::flash('page', 'permissions');
+        $this->allowedAction('superAdmin');
 
-        return view('permission::permissions.form');
+        return view('permission::permissions.create');
     }
 
     public function store(PermissionRequest $request)
     {
-        // $this->allowedAction('addPermission');
+        $this->allowedAction('superAdmin');
 
         $this->permissionRepository->store($request);
 
@@ -44,32 +44,36 @@ class PermissionsController extends AppController
 
     public function edit(string $id)
     {
-        // $this->allowedAction('editPermission');
-        Session::flash('page', 'permissions');
+        $this->allowedAction('superAdmin');
 
         $permission = $this->permissionRepository->show($id);
 
-        return view('permission::permissions.form', ['permission' => $permission]);
+        return view('permission::permissions.create', compact('permission'));
     }
 
     public function update(PermissionRequest $request, string $id)
     {
-        // $this->allowedAction('editPermission');
+        $this->allowedAction('superAdmin');
 
         $this->permissionRepository->update($request, $id);
 
         return redirect()->route('admin.permissions.index');
     }
 
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
-        // $this->allowedAction('destroyPermission');
+        try {
+            $this->allowedAction('superAdmin');
 
-        if ($this->permissionRepository->destroy($id) == 1)
-            return response()->json(["success" => true, 'message' => "Permissão apagada com sucesso!"]);
-        else
-            return response()->json(["error" => true, 'message' => "Erro ao apagar permissão"]);
+            $permission = $this->permissionRepository->destroy($id);
+
+            return $this->ok($permission, "Permissão apagada com sucesso!");
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail("Erro ao apagar permissão", $e, $e->getCode());
+        }
     }
+
     public function dataTable(Request $request)
     {
         $data = $this->permissionRepository->dataTable($request);

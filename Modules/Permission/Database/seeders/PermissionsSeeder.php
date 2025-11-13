@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\Permission\Database\seeders;
+namespace Modules\Permission\Database\Seeders;
 
-use Modules\Permission\Entities\Permissions;
 use Illuminate\Database\Seeder;
+use Modules\Permission\Entities\Permission;
 
 class PermissionsSeeder extends Seeder
 {
@@ -12,6 +12,6 @@ class PermissionsSeeder extends Seeder
      */
     public function run(): void
     {
-        Permissions::factory(3)->create();
+        Permission::factory(3)->create();
     }
 }

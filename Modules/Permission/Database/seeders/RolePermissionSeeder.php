@@ -2,16 +2,16 @@
 
 namespace Modules\Permission\Database\Seeders;
 
-use Modules\Permission\Entities\Role;
 use Illuminate\Database\Seeder;
+use Modules\Permission\Entities\RolePermission;
 
-class RolesSeeder extends Seeder
+class RolePermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Role::factory(3)->create();
+        RolePermission::factory(3)->create();
     }
 }

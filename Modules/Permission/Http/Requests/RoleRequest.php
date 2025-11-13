@@ -29,8 +29,16 @@ class RoleRequest extends FormRequest
         if ($this->get("role_id"))
             $rules['code'] = ['required', Rule::unique('roles')->ignore($this->get("role_id")), 'max:191'];
         else
-            $rules['code'] = ["required|unique:roles|max:191"];
+            $rules['code'] = "required|unique:roles|max:191";
 
         return $rules;
+    }
+
+    public function messages(): array
+    {
+        return [
+            'code.required' => 'O código é obrigatório.',
+            'code.unique'   => 'Este código já existe.',
+        ];
     }
 }

@@ -24,14 +24,23 @@ class PermissionRequest extends FormRequest
     {
         $rules = [
             'name' => 'required|string|max:255',
-            "category" => "required|string|max:255"
+            "category" => "required|string|max:255",
+            "visible" => 'nullable'
         ];
 
         if ($this->get("permission_id"))
             $rules["code"] = ['required', Rule::unique('permissions')->ignore($this->get("permission_id")), 'max:255'];
         else
-            $rules["code"] = ["required|unique:permissions|max:255"];
+            $rules["code"] = "required|unique:permissions|max:255";
 
         return $rules;
+    }
+
+    public function messages(): array
+    {
+        return [
+            'code.required' => 'O código é obrigatório.',
+            'code.unique'   => 'Este código já existe.',
+        ];
     }
 }
