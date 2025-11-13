@@ -2,11 +2,12 @@
 
 namespace Modules\SharedRoles\Http\Controllers\Api;
 
-use App\Http\Controllers\AppController;
+use App\Http\Controllers\ApiController;
 use Modules\SharedRoles\Repositories\SharedRoleRepository;
 use Illuminate\Http\Request;
+use Modules\SharedRoles\DataTables\SharedRoleDataTable;
 
-class SharedRoleController extends AppController
+class SharedRoleController extends ApiController
 {
     protected SharedRoleRepository $sharedRoleRepository;
 
@@ -15,35 +16,29 @@ class SharedRoleController extends AppController
         $this->sharedRoleRepository = $sharedRoleRepository;
     }
 
-    public function dataTable(Request $request)
+    public function index(SharedRoleDataTable $dataTable)
     {
-        // $this->allowedAction('getSharedRoles');
-
-        $response = $this->sharedRoleRepository->dataTable($request);
-
-        return $response;
+        try {
+            return $dataTable->ajax();
+        } catch (\Exception $e) {
+            return $this->fail($e->getMessage(), $e, $e->getCode());
+        }
     }
 
     public function checkRoleCode(Request $request)
     {
-        // $this->allowedAction('getSharedRoles');
+        try {
+            $this->allowedAction('viewSharedRole');
 
-        $request->validate([
-            "id" => "nullable",
-            "code" => "required|string|max:255",
-        ]);
+            $request->validate([
+                "id" => "nullable",
+                "code" => "required|string|max:255",
+            ]);
 
-        $response = $this->sharedRoleRepository->checkCode($request);
+            $exists = $this->sharedRoleRepository->checkCode($request);
 
-        return $response;
-    }
-
-    public function destroy(string $id)
-    {
-        // $this->allowedAction('destroySharedRoles');
-
-        $response = $this->sharedRoleRepository->destroy($id);
-
-        return $response;
+            return $this->ok(additionals: ['exists' => $exists]);
+        } catch (\Exception $e) {
+        }
     }
 }

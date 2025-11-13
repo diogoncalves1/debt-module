@@ -3,12 +3,15 @@
 namespace Modules\SharedRoles\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\SharedRoles\Entities\SharedPermission;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SharedPermission>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Modules\SharedRoles\Entities\SharedPermission>
  */
 class SharedPermissionFactory extends Factory
 {
+    protected $model = SharedPermission::class;
+
     /**
      * Define the model's default state.
      *

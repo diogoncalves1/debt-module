@@ -13,6 +13,14 @@ class SharedRole extends Model
     protected $table = "shared_roles";
     protected $fillable = ["name", "code"];
     protected $guarded = ["id"];
+    protected $casts = [
+        'name' => 'object'
+    ];
+
+    protected static function newFactory()
+    {
+        return \Modules\SharedRoles\Database\Factories\SharedRoleFactory::new();
+    }
 
     public function permissions()
     {

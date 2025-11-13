@@ -32,11 +32,11 @@ class SharedRoleRequest extends FormRequest
         else
             $rules['code'] = "required|unique:shared_roles|max:191";
 
-        $languages = Language::cases();
+        $languages = config('languages');
 
         foreach ($languages as $language) {
-            $rules['name.' . $language->name] = "required|string|max:100";
-            $rules['name.' . $language->name] = "required|string|max:100";
+            $rules['name.' . $language] = "required|string|max:100";
+            $rules['name.' . $language] = "required|string|max:100";
         }
 
         return $rules;
