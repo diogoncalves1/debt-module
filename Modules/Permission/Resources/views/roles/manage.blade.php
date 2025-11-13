@@ -1,9 +1,10 @@
 @extends('layouts.admin')
 
-@section('title', 'CashManager | Gerir Permissões')
+@section('title', 'Permission Module | Manage Role Permissions')
 
 @section('breadcrumb')
-<li class="breadcrumb-item active"><a class="text-white" href="{{ route('admin.roles.index') }}">Papeis</a></li>
+<li class="breadcrumb-item active"><a class="text-white" href="{{ route('admin.roles.index') }}">Roles</a>
+</li>
 <li class="breadcrumb-item active">Gerir Permissões</li>
 @endsection
 
@@ -13,7 +14,7 @@
 
 @section('content')
 <section class="content">
-    <form action="{{ route('admin.roles.manage.update', $roleId) }}" method="POST">
+    <form action="{{ route('admin.roles.manage.update', $id) }}" method="POST">
         @csrf
         @method('POST')
         <div class="col-12">
@@ -30,7 +31,7 @@
                 </div>
                 <div class="card-body">
                     @foreach ($permissionsGrouped as $category => $permissions)
-                    <h4><b><?= $category ?></b></h4>
+                    <h4><b>{{ $category }}</b></h4>
                     @foreach ($permissions as $index => $permission)
                     @if ($index % 4 == 0)
                     <div class="row">
@@ -39,9 +40,9 @@
                             <div class="form-group clearfix">
                                 <div class="icheck-success d-inline ">
                                     <input class="form-control" type="checkbox" name="permissions[]"
-                                        value="{{ $permission->id }}" id="<?= $permission->code ?>"
-                                        <?= in_array($permission->id, $rolePermissionsIds) ? 'checked' : '' ?>>
-                                    <label for="<?= $permission->code ?>"><?= $permission->name ?></label>
+                                        value="{{ $permission->id }}" id="{{ $permission->code }}"
+                                        {{ in_array($permission->id, $rolePermissionsIds) ? 'checked' : '' }}>
+                                    <label for="{{ $permission->code }}">{{ $permission->name }}</label>
                                 </div>
                             </div>
                         </div>

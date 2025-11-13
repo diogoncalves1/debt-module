@@ -5,7 +5,7 @@ namespace Modules\Permission\Providers;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Modules\Permission\Entities\Permissions;
+use Modules\Permission\Entities\Permission;
 
 class PermissionServiceProvider extends ServiceProvider
 {
@@ -41,7 +41,7 @@ class PermissionServiceProvider extends ServiceProvider
                 $permission = $actions['permission'];
             }
 
-            $objPermission = new Permissions();
+            $objPermission = new Permission();
             $permissions = $objPermission->permissions($user->id);
 
             if (!$permissions)

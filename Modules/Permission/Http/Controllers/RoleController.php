@@ -2,112 +2,135 @@
 
 namespace Modules\Permission\Http\Controllers;
 
+use App\Http\Controllers\ApiController;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Modules\Permission\Http\Requests\RoleRequest;
 use Modules\Permission\Http\Requests\UpdateRolePermissionsRequest;
 use Modules\Permission\Repositories\PermissionRepository;
 use Modules\Permission\Repositories\RoleRepository;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
-use App\Http\Controllers\AppController;
+use Illuminate\Support\Facades\Log;
+use Modules\Permission\DataTables\RoleDataTable;
 
-class RoleController extends AppController
+class RoleController extends ApiController
 {
-    private $roleRepository;
+    private  RoleRepository $repository;
     private $permissionRepository;
 
     public function __construct(RoleRepository $repository, PermissionRepository $permissionRepository)
     {
-        $this->roleRepository = $repository;
+        $this->repository = $repository;
         $this->permissionRepository = $permissionRepository;
     }
 
-    public function index()
+    /**
+     * Display a listing of the resource.
+     *
+     * @param RoleDataTable
+     * @throws AuthorizationException
+     */
+    public function index(RoleDataTable $dataTable)
     {
-        // $this->allowedAction('viewRoles');
-        Session::flash('page', 'roles');
+        $this->allowedAction('viewRole');
 
-        $roles = $this->roleRepository->all();
-
-        return view('permission::roles.index', ['roles' => $roles]);
+        return $dataTable->render('permission::roles.index');
     }
 
-    public function create()
+    /**
+     * Show the form for create a new resource.
+     * @return Renderable
+     * @throws AuthorizationException
+     */
+    public function create(): Renderable
     {
-        // $this->allowedAction('addRole');
-        Session::flash('page', 'roles');
+        $this->allowedAction('createRole');
 
-        return view('permission::roles.form');
+        return view('permission::roles.create');
     }
 
-    public function store(RoleRequest $request)
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param RoleRequest $request
+     * @return RedirectResponse
+     * @throws AuthorizationException
+     */
+    public function store(RoleRequest $request): RedirectResponse
     {
-        // $this->allowedAction('addRole');
+        $this->allowedAction('createRole');
 
-        $this->roleRepository->store($request);
+        $this->repository->store($request);
 
         return redirect()->route('admin.roles.index');
     }
+
 
     public function edit(string $id)
     {
-        // $this->allowedAction('editRole');
-        Session::flash('page', 'roles');
+        $this->allowedAction('editRole');
 
-        $role = $this->roleRepository->show($id);
+        $role = $this->repository->show($id);
 
-        return view('permission::roles.form', ["role" => $role]);
+        return view('permission::roles.create', ["role" => $role]);
     }
 
-    public function update(RoleRequest $request, string $id)
+    /**
+     * Update the specified resource in storage.
+     * @param RoleRequest $request
+     * @param string $id
+     * @return RedirectResponse
+     * @throws AuthorizationException
+     */
+    public function update(RoleRequest $request, string $id): RedirectResponse
     {
-        // $this->allowedAction('editRole');
+        $this->allowedAction('editRole');
 
-        $this->roleRepository->update($request, $id);
+        $this->repository->update($request, $id);
 
         return redirect()->route('admin.roles.index');
     }
 
-    public function destroy(string $id)
+    /**
+     * Remove the specified resource from storage.
+     * @param string $id
+     * @return JsonResponse
+     */
+    public function destroy(string $id): JsonResponse
     {
-        // $this->allowedAction('destroyRole');
+        try {
+            $this->allowedAction('destroyRole');
 
-        return $this->roleRepository->destroy($id);
+            $role = $this->repository->destroy($id);
+
+            return $this->ok($role, "Perfil apagado com sucesso!");
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail("Erro ao tentar apagar esse perfil.", $e, $e->getCode());
+        }
     }
 
-    public function showManageForm(string $id)
+    /**
+     * Show the form for create a new resource.
+     * @return Renderable
+     * @throws AuthorizationException
+     */
+    public function showManageForm(string $id): Renderable
     {
-        // $this->allowedAction('manageRolePermissions');
+        $this->allowedAction('manageRole');
 
-        Session::flash('page', 'roles');
-
-        $rolePermissionsIds = $this->roleRepository->getRolePermissionsIds($id);
-
+        $rolePermissionsIds = $this->repository->getRolePermissionsIds($id);
         $permissionsGrouped = $this->permissionRepository->getPermissionsGrouped();
 
-        $data = [
-            "rolePermissionsIds" => $rolePermissionsIds,
-            "permissionsGrouped" => $permissionsGrouped,
-            "roleId" => $id
-        ];
-
-        return view('permission::roles.manage', $data);
+        return view('permission::roles.manage', compact('rolePermissionsIds', 'permissionsGrouped', 'id'));
     }
 
     public function manage(UpdateRolePermissionsRequest $request, string $id)
     {
-        // $this->allowedAction('manageRolePermissions');
+        $this->allowedAction('manageRole');
 
-        $this->roleRepository->managePermissions($request, $id);
+        $this->repository->managePermissions($request, $id);
 
         return redirect()->route('admin.roles.index');
-    }
-
-    public function dataTable(Request $request)
-    {
-        // $this->allowedAction('viewRoles');
-
-        $data = $this->roleRepository->dataTable($request);
-
-        return response()->json($data);
     }
 }

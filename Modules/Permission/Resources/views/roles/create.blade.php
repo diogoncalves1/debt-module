@@ -1,9 +1,9 @@
 @extends('layouts.admin')
 
-@section('title', 'CashManager | Adicionar Papeis ')
+@section('title', 'Permission Module | ' . isset($role) ? 'Editar' : 'Adicionar' .' Role')
 
 @section('breadcrumb')
-<li class="breadcrumb-item active"><a class="text-white" href="{{ route('admin.roles.index') }}">Papeis</a>
+<li class="breadcrumb-item active"><a class="text-white" href="{{ route('admin.roles.index') }}">Roles</a>
 </li>
 <li class="breadcrumb-item active">{{ isset($role) ? 'Editar' : 'Adicionar' }}</li>
 @endsection
@@ -29,19 +29,19 @@
                     <div class="card-body">
                         <div class="form-group">
                             <label for="inputCode">Código <span class="text-danger">*</span></label>
-                            <input type="text" name="code" value='{{ $role->code ?? "" }}' class="validate form-control"
+                            <input type="text" name="code" value='{{ $role->code ?? "" }}' class="form-control {{ $errors->has('code') ? ' is-invalid' : '' }}"
                                 required>
-                            <span class="error invalid-feedback" id="errorFeedbackCode">Preencha este campo</span>
-                            <span class="success valid-feedback">Campo preenchido</span>
+                            @if ($errors->has('code'))
+                            <span class="error invalid-feedback">
+                                <strong>{{ $errors->first('code') }}</strong>
+                            </span>
+                            @endif
                         </div>
 
                         <div class="form-group">
                             <label for="inputDisplayName">Nome <span class="text-danger">*</span></label>
-                            <input type="text" name="name" value='{{ $role->name ?? "" }}' class="validate form-control"
+                            <input type="text" name="name" value='{{ $role->name ?? "" }}' class="form-control"
                                 required>
-                            <span class="error invalid-feedback">Preencha este
-                                campo</span>
-                            <span class="success valid-feedback">Campo preenchido</span>
                         </div>
 
                     </div>

@@ -8,24 +8,49 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use App\Repositories\RepositoryInterface;
+use Illuminate\Support\Facades\Auth;
+use Modules\Permission\Entities\Permission;
 
 class PermissionRepository implements RepositoryInterface
 {
+    protected RoleRepository $roleRepository;
+
+    public function __construct(RoleRepository $roleRepository)
+    {
+        $this->roleRepository = $roleRepository;
+    }
+
     public function all()
     {
-        return Permissions::all();
+        return Permission::where('visible', 1)->orderBy('name', 'asc')->get();
+    }
+
+    public function allAndNotVisible()
+    {
+        return Permission::orderBy('name', 'asc')->get();
     }
 
     public function store(Request $request)
     {
         try {
-            $input = $request->all();
+            DB::transaction(function () use ($request) {
+                $role = $this->roleRepository->showByCode('superAdmin');
+                $input = $request->except('visible');
 
-            DB::transaction(function () use ($input) {
-                $permission = Permissions::create($input);
+                if ($request->get('visible') && $request->get('visible') == 1)
+                    $input['visible'] = 1;
+                else
+                    $input['visible'] = 0;
 
-                Log::info('Permission ' . $permission->id . ' added');
+                $permission = Permission::create($input);
+                $role->permissions()->attach($permission->id);
 
+                if ($permission->visible == 1) {
+                    $role = $this->roleRepository->showByCode('admin');
+                    $role->permissions()->attach($permission->id);
+                }
+
+                Log::info('Permission ' . $permission->id . ' added.');
                 Session::flash('success', 'Permissão adicionada com sucesso!');
             });
         } catch (\Exception $e) {
@@ -75,12 +100,12 @@ class PermissionRepository implements RepositoryInterface
 
     public function show(string $id)
     {
-        return Permissions::find($id);
+        return Permission::find($id);
     }
 
     public function dataTable(Request $request)
     {
-        $query = Permissions::query();
+        $query = Permission::where('visible', 1);
         if ($search = $request->input('search.value')) {
             $query->where(function ($q) use ($search) {
                 $q->where("name", 'like', "{$search}%")
@@ -127,7 +152,10 @@ class PermissionRepository implements RepositoryInterface
     public function getPermissionsGrouped()
     {
         try {
-            $permissions = $this->all();
+            if (Auth::user()->can('authorization', 'superAdmin'))
+                $permissions = $this->allAndNotVisible();
+            else
+                $permissions = $this->all();
 
             return $permissions->groupBy('category');
         } catch (\Exception $e) {

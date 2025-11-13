@@ -1,16 +1,16 @@
 <?php
 
-namespace Database\Factories;
+namespace Modules\Permission\Database\Factories;
 
-use Modules\Permission\Entities\Permissions;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Permission\Entities\Permission;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Permissions>
  */
-class PermissionsFactory extends Factory
+class PermissionFactory extends Factory
 {
-    protected $model = Permissions::class;
+    protected $model = Permission::class;
     /**
      * Define the model's default state.
      *
@@ -22,6 +22,7 @@ class PermissionsFactory extends Factory
             "name" => $this->faker->word(),
             "code" => $this->faker->unique()->word(),
             "category" => $this->faker->word(),
+            "visible" => $this->faker->boolean(95)
         ];
     }
 }
