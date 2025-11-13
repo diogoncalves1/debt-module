@@ -1,5 +1,6 @@
 {
     "Accounts": true,
+    "ApiResponder": true,
     "Currency": true,
     "Debts": true,
     "Permission": true,
