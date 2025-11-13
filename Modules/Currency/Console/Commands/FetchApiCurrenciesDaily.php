@@ -4,6 +4,7 @@ namespace Modules\Currency\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Modules\Currency\Entities\Currency;
 
 class FetchApiCurrenciesDaily extends Command
@@ -21,20 +22,23 @@ class FetchApiCurrenciesDaily extends Command
      */
     public function handle()
     {
+        try {
+            $apiToken = config('currency.services.external.api_key');
+            $response = Http::get("https://v6.exchangerate-api.com/v6/$apiToken/latest/USD");
 
-        $apiToken = "fbd30e414a2fcb5b26108b54";
-        $response = Http::get("https://v6.exchangerate-api.com/v6/$apiToken/latest/USD");
+            if ($response->successful()) {
+                $data = $response->json();
 
-        if ($response->successful()) {
-            $data = $response->json();
+                foreach ($data['conversion_rates'] as $currency => $rate) {
+                    Currency::where("code", $currency)->update(['rate' => $rate]);
+                }
 
-            foreach ($data['conversion_rates'] as $currency => $rate) {
-                Currency::where("code", $currency)->update(['rate' => $rate]);
+                $this->info('Dados salvos com sucesso.');
+            } else {
+                $this->error('Erro ao buscar dados da API.');
             }
-
-            $this->info('Dados salvos com sucesso.');
-        } else {
-            $this->error('Erro ao buscar dados da API.');
+        } catch (\Exception $e) {
+            Log::error($e);
         }
     }
 }

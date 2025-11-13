@@ -2,6 +2,7 @@
 
 namespace Modules\Currency\Providers;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
@@ -34,9 +35,22 @@ class CurrencyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->mergeConfigFrom(
+            __DIR__ . '/../Config/services.php',
+            'currency.services'
+        );
+
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
     }
+
+    protected function mapApiRoutes()
+    {
+        Route::prefix('api')
+            ->middleware('api')
+            ->group(module_path('Currency', '/Routes/api.php'));
+    }
+
 
     /**
      * Register commands in the format of Command::class
