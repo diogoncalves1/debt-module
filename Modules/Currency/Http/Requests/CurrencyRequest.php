@@ -2,7 +2,6 @@
 
 namespace Modules\Currency\Http\Requests;
 
-use Modules\Currency\Enums\Language;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,11 +26,10 @@ class CurrencyRequest extends FormRequest
             'symbol' => 'required|string|max:50',
         ];
 
-        $languages = Language::cases();
+        $languages = config('languages');
 
         foreach ($languages as $language) {
-            $rules[$language->name] = "required|array";
-            $rules[$language->name . '.name'] = "required|string|max:100";
+            $rules[$language] = "required|string|max:191";
         }
 
         if ($this->get('currency_id'))

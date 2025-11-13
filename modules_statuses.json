@@ -1,4 +1,5 @@
 {
-    "Debts": true,
-    "Accounts": true
+    "Accounts": true,
+    "Currency": true,
+    "Debts": true
 }

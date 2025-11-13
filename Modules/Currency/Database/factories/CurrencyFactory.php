@@ -1,14 +1,18 @@
 <?php
 
-namespace Modules\Currency\Database\factories;
+namespace Modules\Currency\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Currency\Entities\Currency;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Currency>
  */
 class CurrencyFactory extends Factory
 {
+
+    protected $model = Currency::class;
+
     /**
      * Define the model's default state.
      *
@@ -18,23 +22,15 @@ class CurrencyFactory extends Factory
     {
         $code =  $this->faker->unique()->currencyCode();
 
-
-        $currencies = [
-            'USD' => ['symbol' => '$', 'info' => '{"en": {"name": "United States Dollar"}}'],
-            'EUR' => ['symbol' => '€', 'info' => '{"en": {"name": "Euro"}}'],
-            'GBP' => ['symbol' => '£', 'info' => '{"en": {"name": "British Pound Sterling"}}'],
-            'JPY' => ['symbol' => '¥', 'info' => '{"en": {"name": "Japanese Yen"}}'],
-            'AUD' => ['symbol' => 'A$', 'info' => '{"en": {"name": "Australian Dollar"}}'],
-            'CAD' => ['symbol' => 'C$', 'info' => '{"en": {"name": "Canadian Dollar"}}'],
-        ];
+        $currencies = config('currency.currencies');
 
         $symbol = $currencies[$code]['symbol'] ?? '$';
-        $info = $currencies[$code]['info'] ?? '{"en": {"name": "United States Dollar"}}';
+        $name = $currencies[$code]['name'] ?? '{"en": "United States Dollar"}';
 
         return [
             "code" => $code,
             "symbol" => $symbol,
-            "info" => $info,
+            "name" => $name,
             "rate" => $this->faker->randomFloat(4, 0.1, 5)
         ];
     }

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin | ' . (isset($currency) ? 'Editar' : 'Adicionar') . ' Moeda ')
+@section('title', 'Currency Module | ' . (isset($currency) ? 'Editar' : 'Adicionar') . ' Moeda ')
 
 @section('breadcrumb')
 <li class="breadcrumb-item"><a class="text-white" href="{{ route('admin.currencies.index') }}">Moedas</a></li>
@@ -14,7 +14,7 @@
         @csrf
 
         @if(isset($currency))
-        <input type="hidden" name="currency_id" value="{{ $currency->id ?? null }}">
+        <input type="hidden" id="currencyId" name="currency_id" value="{{ $currency->id ?? null }}">
         @endif
         <div class="row">
             <div class="col-12">
@@ -55,9 +55,9 @@
                         <ul class="nav nav-pills">
                             @foreach ($languages as $key => $language)
                             <li class="nav-item">
-                                <a href="#{{ $language->name }}" data-toggle="tab"
+                                <a href="#{{ $language }}" data-toggle="tab"
                                     @class(['nav-link', 'active'=> $key == 0]) >
-                                    {{ $language->value; }}
+                                    {{ strtoupper($language) }}
                                 </a>
                             </li>
                             @endforeach
@@ -68,12 +68,12 @@
                         <div class="tab-content">
                             @foreach ($languages as $key => $language)
                             <div @class(['tab-pane', 'active'=> $key == 0])
-                                id="{{ $language->name }}">
+                                id="{{ $language }}">
                                 <div class="form-group">
-                                    <label for="inputDisplayName">Nome em {{ $language->value }} <span
+                                    <label for="inputDisplayName">Nome em {{ strtoupper($language) }} <span
                                             class="text-danger">*</span></label>
-                                    <input type="text" name="{{ $language->name }}[name]" placeholder="Nome em {{ $language->value }}..."
-                                        value="{{ isset($currency) ? (json_decode($currency->info)->{$language->name})->name ?? '' : '' }}"
+                                    <input type="text" name="{{ $language }}" placeholder="Nome em {{ strtoupper($language) }}..."
+                                        value="{{ isset($currency) ? $currency->name->{$language} ?? '' : '' }}"
                                         class="form-control" required>
                                     <span class="error invalid-feedback">Preencha este
                                         campo</span>

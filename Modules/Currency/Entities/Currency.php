@@ -11,7 +11,15 @@ class Currency extends Model
     use HasFactory;
 
     protected $table = "currencies";
-    protected $fillable = ['code', 'info', 'symbol', 'rate'];
+    protected $fillable = ['code', 'name', 'symbol', 'rate'];
+    protected $casts = [
+        'name' => 'object'
+    ];
+
+    protected static function newFactory()
+    {
+        return \Modules\Currency\Database\Factories\CurrencyFactory::new();
+    }
 
     public function scopeCode($query, $code)
     {
