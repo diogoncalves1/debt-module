@@ -1,19 +1,24 @@
 <?php
-
 namespace Modules\Accounts\Entities;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Modules\SharedRoles\Entities\SharedRole;
 use Modules\User\Entities\User;
 
-class AccountUser extends Model
+class AccountUser extends Pivot
 {
-    /** @use HasFactory<\Database\Factories\AccountUserFactory> */
+    /** @use HasFactory<\Modules\Accounts\Database\Factories\AccountUserFactory> */
     use HasFactory;
 
-    protected $table = 'accounts_user';
-    protected $fillable = ['user_id', 'account_id', 'shared_role_id', 'status', 'invited_at', 'accepted_at'];
+    protected $table    = 'account_users';
+    protected $fillable = ['user_id', 'account_id', 'shared_role_id'];
+
+    protected static function newFactory()
+    {
+        return \Modules\Accounts\Database\Factories\AccountUserFactory::new ();
+    }
 
     public function user()
     {
@@ -23,15 +28,11 @@ class AccountUser extends Model
     {
         return $this->belongsTo(Account::class);
     }
-    public function sharedRole()
+    public function sharedRole(): BelongsTo
     {
-        return $this->belongsTo(SharedRole::class);
+        return $this->belongsTo(SharedRole::class, 'shared_role_id');
     }
 
-    public function scopeStatus($query, $status)
-    {
-        return $query->where('status', $status);
-    }
     public function scopeUser($query, $userId)
     {
         return $query->where('user_id', $userId);

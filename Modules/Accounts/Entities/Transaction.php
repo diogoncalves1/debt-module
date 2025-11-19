@@ -1,21 +1,24 @@
 <?php
-
 namespace Modules\Accounts\Entities;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Category\Entities\Category;
-// use Modules\Currency\Entities\Currency;
 use Modules\SharedRoles\Entities\SharedRole;
 use Modules\User\Entities\User;
 
 class Transaction extends Model
 {
-    /** @use HasFactory<\Database\Factories\TransactionFactory> */
+    /** @use HasFactory<\Modules\Accounts\Database\Factories\TransactionFactory> */
     use HasFactory;
 
-    protected $table = 'transactions';
-    protected $fillable = ['user_id', 'account_id', 'type', 'amount', 'date', 'description', 'status', 'category_id'/*, 'currency_id'*/];
+    protected $table    = 'transactions';
+    protected $fillable = ['user_id', 'account_id', 'type', 'amount', 'date', 'description', 'status', 'category_id' /*, 'currency_id'*/];
+
+    protected static function newFactory()
+    {
+        return \Modules\Accounts\Database\Factories\TransactionFactory::new ();
+    }
 
     public function user()
     {
@@ -40,11 +43,6 @@ class Transaction extends Model
             'shared_role_id'
         );
     }
-    // public function currency()
-    // {
-    //     return $this->belongsTo(Currency::class);
-    // }
-
 
     public function scopeType($query, $type)
     {
@@ -52,7 +50,7 @@ class Transaction extends Model
     }
     public function scopeAccount($query, $accountId)
     {
-        return $query->where('transactions.account_id', $accountId);
+        return $query->where('account_id', $accountId);
     }
     public function scopeStatus($query, $status)
     {
@@ -60,7 +58,7 @@ class Transaction extends Model
     }
     public function scopeUser($query, $userId)
     {
-        return $query->where('transactions.user_id', $userId);
+        return $query->where('user_id', $userId);
     }
     public function scopeCategory($query, $categoryId)
     {

@@ -1,5 +1,4 @@
 <?php
-
 namespace Modules\Accounts\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,8 +21,8 @@ class TransactionUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => 'required|numeric|min:0',
-            'date' => 'required|date',
+            'amount'      => 'required|numeric|min:0',
+            'date'        => 'required|date',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
         ];

@@ -11,6 +11,6 @@ class SingleAccountCreatorViolationException extends Exception
 
     public function __construct()
     {
-        parent::__construct(__('exceptions.singleAccountCreatorViolationException'), $this->code);
+        parent::__construct(__('accounts::exceptions.accounts.singleAccountCreatorViolationException'), $this->code);
     }
 }

@@ -11,16 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('accounts_user', function (Blueprint $table) {
+        Schema::create('account_users', function (Blueprint $table) {
+            $table->id();
             $table->unsignedBigInteger('account_id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('shared_role_id')->nullable();
-
-            $table->enum('status', ['pending', 'accepted', 'revoked'])->default('pending');
-
-            $table->timestamp('invited_at')->nullable()->useCurrent();
-            $table->timestamp('accepted_at')->nullable();
-
             $table->timestamps();
 
             $table->foreign('account_id')->references('id')->on('accounts')->onDelete('cascade');

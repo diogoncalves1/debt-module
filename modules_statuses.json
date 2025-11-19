@@ -1,8 +1,12 @@
 {
     "Accounts": true,
+    "ApiResponder": true,
+    "Category": true,
     "Currency": true,
     "Debts": true,
+    "Friends": true,
     "Permission": true,
     "SharedRoles": true,
-    "User": true
+    "User": true,
+    "UserPreferences": true
 }

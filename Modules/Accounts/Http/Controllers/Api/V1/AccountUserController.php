@@ -1,67 +1,80 @@
 <?php
-
 namespace Modules\Accounts\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\AppController;
-use Modules\Accounts\Http\Requests\InviteUserAccountRequest;
-use Modules\Accounts\Http\Requests\RemoveUserAccountRequest;
+use App\Http\Controllers\ApiController;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Modules\Accounts\Http\Requests\InviteUserAccountRequest;
+use Modules\Accounts\Http\Resources\AccountUserResource;
 use Modules\Accounts\Repositories\AccountUserRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
-class AccountUserController extends AppController
+/**
+ * Finished: true
+ */
+class AccountUserController extends ApiController
 {
-    private AccountUserRepository $accountUserRepository;
-    public function __construct(AccountUserRepository $accountUserRepository)
+    private AccountUserRepository $repository;
+
+    public function __construct(AccountUserRepository $repository)
     {
-        $this->accountUserRepository = $accountUserRepository;
+        $this->repository = $repository;
     }
 
-    public function inviteUser(InviteUserAccountRequest $request, string $id)
+    /**
+     * Remove user from account.
+     * @param Request $request
+     * @param string $id
+     * @param string $userId
+     * @return JsonResponse
+     */
+    public function revokeUser(Request $request, string $id, string $userId): JsonResponse
     {
-        $response = $this->accountUserRepository->inviteUser($request, $id);
+        try {
+            $relation = $this->repository->revokeUser($request, $id, $userId);
 
-        return $response;
+            return $this->ok(message: __('accounts::messages.account-users.revokeUser', ['userName' => $relation->user->name, 'accountName' => $relation->account->name]));
+        } catch (Exception $e) {
+            Log::error($e);
+            return $this->fail($e->getMessage(), $e, $e->getCode());
+        }
     }
 
-    public function acceptInvite(Request $request, string $id)
+    /**
+     * Update user role from account.
+     * @param Request $request
+     * @param string $id
+     * @param string $userId
+     * @return JsonResponse
+     */
+    public function updateUserRole(InviteUserAccountRequest $request, string $id, string $userId): JsonResponse
     {
-        $response = $this->accountUserRepository->acceptInvite($request, $id);
+        try {
+            $relation = $this->repository->updateUserRole($request, $id, $userId);
 
-        return $response;
+            return $this->ok(new AccountUserResource($relation), __('accounts::messages.account-users.updateUserRole', ['accountName' => $relation->account->name, 'userName' => $relation->user->name]));
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail($e->getMessage(), $e, $e->getCode());
+        }
     }
 
-    public function destroyInvite(RemoveUserAccountRequest $request, string $id)
+    /**
+     * Leave user role from account.
+     * @param Request $request
+     * @param string $id
+     * @return JsonResponse
+     */
+    public function leave(Request $request, string $id): JsonResponse
     {
-        $response = $this->accountUserRepository->destroyInvite($request, $id);
+        try {
+            $relation = $this->repository->leave($request, $id);
 
-        return $response;
-    }
-
-    public function revokeInvite(Request $request, string $id)
-    {
-        $response = $this->accountUserRepository->revokeInvite($request, $id);
-
-        return $response;
-    }
-
-    public function revokeUser(RemoveUserAccountRequest $request, string $id)
-    {
-        $response = $this->accountUserRepository->revokeUser($request, $id);
-
-        return $response;
-    }
-
-    public function updateUserRole(InviteUserAccountRequest $request, string $id)
-    {
-        $response = $this->accountUserRepository->updateUserRole($request, $id);
-
-        return $response;
-    }
-
-    public function leave(Request $request, string $id)
-    {
-        $response = $this->accountUserRepository->leave($request, $id);
-
-        return $response;
+            return $this->ok(message: __('accounts::messages.account-users.leave', ['accountName' => $relation->account->name]));
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail($e->getMessage(), $e, $e->getCode());
+        }
     }
 }

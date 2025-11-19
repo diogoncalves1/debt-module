@@ -1,5 +1,4 @@
 <?php
-
 namespace Modules\Accounts\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,10 +21,10 @@ class AccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'currency_id' => 'required|exists:currencies,id',
-            'type' => 'required|string',
-            'active' => 'required'
+            'type'        => 'required|string|in:cash,bank_account,credit_card,digital_wallet',
+            'active'      => 'required',
         ];
     }
 }
