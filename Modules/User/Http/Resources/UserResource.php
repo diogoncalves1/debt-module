@@ -1,5 +1,4 @@
 <?php
-
 namespace Modules\User\Http\Resources;
 
 use Illuminate\Http\Request;
@@ -13,9 +12,11 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'name' => $this->name,
-            'email' => $this->email,
-            'roles' => $this->roles,
+            'id'         => $this->id,
+            'name'       => $this->name,
+            'email'      => $this->email,
+            'roles'      => $this->whenLoaded('roles'),
+            'sharedRole' => $this->whenHas('sharedRole', new \Modules\SharedRoles\Http\Resources\SharedRoleResource($this->sharedRole)),
         ];
     }
 }
