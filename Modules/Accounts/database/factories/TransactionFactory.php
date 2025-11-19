@@ -4,15 +4,17 @@ namespace Modules\Accounts\Database\Factories;
 
 use Modules\Accounts\Entities\Account;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Accounts\Entities\Transaction;
 use Modules\Category\Entities\Category;
 use Modules\Currency\Entities\Currency;
 use Modules\User\Entities\User;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Transaction>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Modules\Accounts\Entities\Transaction>
  */
 class TransactionFactory extends Factory
 {
+    protected $model = Transaction::class;
     /**
      * Define the model's default state.
      *
@@ -29,7 +31,6 @@ class TransactionFactory extends Factory
             'description' => $this->faker->sentence(),
             'status' => $this->faker->randomElement(['completed', 'pending']),
             'category_id' => Category::pluck('id')->random(),
-            'currency_id' => Currency::pluck("id")->random()
         ];
     }
 }

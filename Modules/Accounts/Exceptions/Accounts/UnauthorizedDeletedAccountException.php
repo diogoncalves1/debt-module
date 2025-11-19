@@ -1,6 +1,5 @@
 <?php
-
-namespace Modules\Accounts\Exceptions;
+namespace Modules\Accounts\Exceptions\Accounts;
 
 use Exception;
 
@@ -10,6 +9,6 @@ class UnauthorizedDeletedAccountException extends Exception
     protected $code = 403;
     public function __construct()
     {
-        parent::__construct(__('exceptions.unauthorizedDeletedAccountException'), $this->code);
+        parent::__construct(__('accounts::exceptions.accounts.unauthorizedDeletedAccountException'), $this->code);
     }
 }

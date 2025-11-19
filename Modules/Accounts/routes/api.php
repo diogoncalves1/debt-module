@@ -1,33 +1,48 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Accounts\Http\Controllers\Api\V1\AccountController;
+use Modules\Accounts\Http\Controllers\Api\V1\AccountUserController;
+use Modules\Accounts\Http\Controllers\Api\V1\AccountUserInviteController;
+use Modules\Accounts\Http\Controllers\Api\V1\TransactionController;
 
 Route::group([
     'prefix' => 'v1',
-    'as' => 'api.v1.'
+    'as'     => 'api.v1.',
 ], function () {
     Route::group(
         [
-            'middleware' => ['auth:sanctum' /*, 'setlocale'*/]
+            'middleware' => ['auth:sanctum', 'setlocale'],
         ],
         function () {
+            // Accounts
             Route::group([
                 'prefix' => 'accounts',
-                'as' => 'accounts.'
+                'as'     => 'accounts.',
             ], function () {
-                Route::post('/{id}/invite', [\Modules\Accounts\Http\Controllers\Api\V1\AccountUserController::class, 'inviteUser']);
-                Route::post('/{id}/accept', [\Modules\Accounts\Http\Controllers\Api\V1\AccountUserController::class, 'acceptInvite']);
-                Route::delete('/{id}/invite', [\Modules\Accounts\Http\Controllers\Api\V1\AccountUserController::class, 'destroyInvite']);
-                Route::post('/{id}/revoke', [\Modules\Accounts\Http\Controllers\Api\V1\AccountUserController::class, 'revokeInvite']);
-                Route::post('/{id}/revoke-user', [\Modules\Accounts\Http\Controllers\Api\V1\AccountUserController::class, 'revokeUser']);
-                Route::put('/{id}/user-role', [\Modules\Accounts\Http\Controllers\Api\V1\AccountUserController::class, 'updateUserRole']);
-                Route::delete('/{id}/leave', [\Modules\Accounts\Http\Controllers\Api\V1\AccountUserController::class, 'leave']);
+                // Invites
+                Route::post('/{id}/invite/{userId}', [AccountUserInviteController::class, 'invite']);
+                Route::post('/{id}/accept', [AccountUserInviteController::class, 'accept']);
+                Route::delete('/{id}/invite/{userId}', [AccountUserInviteController::class, 'destroy']);
+                Route::post('/{id}/revoke', [AccountUserInviteController::class, 'revoke']);
+
+                // Relations
+                Route::post('/{id}/revoke-user/{userId}', [AccountUserController::class, 'revokeUser']);
+                Route::put('/{id}/user-role/{userId}', [AccountUserController::class, 'updateUserRole']);
+                Route::delete('/{id}/leave', [AccountUserController::class, 'leave']);
             });
-            Route::resource('accounts', \Modules\Accounts\Http\Controllers\Api\V1\AccountController::class, ['except' => 'create', 'edit']);
 
-            Route::resource('transactions', \Modules\Accounts\Http\Controllers\Api\V1\TransactionController::class, ['except' => ['show', 'create', 'edit']]);
+            Route::apiResource('accounts', AccountController::class);
 
-            Route::post('scheduled-transactions/confirm/{id}', [\Modules\Accounts\Http\Controllers\Api\V1\TransactionController::class, 'confirmSheduled']);
+            // Transactions
+            Route::apiResource('transactions', TransactionController::class);
+
+            Route::group([
+                'as'     => 'transactions.',
+                'prefix' => 'transactions',
+            ], function () {
+                Route::post('/{id}/confirm', [TransactionController::class, 'confirm']);
+            });
         }
     );
 });

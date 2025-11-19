@@ -1,5 +1,4 @@
 <?php
-
 namespace Modules\Accounts\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,15 +21,14 @@ class TransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'nullable|exists:users,id',
-            'account_id' => 'required|exists:accounts,id',
-            'amount' => 'required|numeric|min:0',
-            'type' => 'required|string|in:revenue,expense',
-            'date' => 'required|date',
-            'description' => 'nullable|string',
-            'status' => 'nullable|in:pending,completed',
+            'user_id'     => 'nullable|exists:users,id',
+            'account_id'  => 'required|exists:accounts,id',
             'category_id' => 'required|exists:categories,id',
-            // 'currency_id' => 'required|exists:currencies,id'
+            'amount'      => 'required|numeric|min:0',
+            'type'        => 'required|string|in:revenue,expense',
+            'date'        => 'required|date',
+            'description' => 'nullable|string',
+            'status'      => 'nullable|in:pending,completed',
         ];
     }
 }

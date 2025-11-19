@@ -1,6 +1,5 @@
 <?php
-
-namespace Modules\Accounts\Exceptions;
+namespace Modules\Accounts\Exceptions\Transactions;
 
 use Exception;
 
@@ -11,6 +10,6 @@ class UnauthorizedDeletedTransactionException extends Exception
 
     public function __construct()
     {
-        parent::__construct(__('exceptions.unauthorizedDeletedTransactionException'), $this->code);
+        parent::__construct(__('accounts::exceptions.transactions.unauthorizedDeletedTransactionException'), $this->code);
     }
 }

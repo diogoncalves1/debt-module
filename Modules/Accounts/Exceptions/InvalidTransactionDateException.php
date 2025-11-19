@@ -11,6 +11,6 @@ class InvalidTransactionDateException extends Exception
 
     public function __construct()
     {
-        parent::__construct(__('exceptions.invalidTransactionDateException'), $this->code);
+        parent::__construct(__('accounts::exceptions.transactions.invalidTransactionDateException'), $this->code);
     }
 }

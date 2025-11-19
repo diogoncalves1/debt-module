@@ -11,6 +11,6 @@ class UnauthorizedCreateTransactionException extends Exception
 
     public function __construct()
     {
-        parent::__construct(__('exceptions.unauthorizedCreateTransactionException'), $this->code);
+        parent::__construct(__('accounts::exceptions.transactions.unauthorizedCreateTransactionException'), $this->code);
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Modules\Accounts\Core;
 
 use DateTime;
@@ -9,16 +8,16 @@ class Helpers
     public static function getAccountIcon($type)
     {
         switch ($type) {
-            case "cash": {
+            case "cash":{
                     return "cash";
                 }
-            case "bank_account": {
+            case "bank_account":{
                     return "building-bank";
                 }
-            case "credit_card": {
+            case "credit_card":{
                     return "credit-card";
                 }
-            case "digital_wallet": {
+            case "digital_wallet":{
                     return "wallet";
                 }
         }
@@ -29,16 +28,30 @@ class Helpers
         return number_format($amount, 2, '.', ',');
     }
 
-    public static function formatMoneyWithSymbol($amount)
+    public static function formatMoneyWithSymbolAndCurrency(float $amount, string $currencyCode, string $currencySymbol): string
     {
-        if ($amount < 1000)
-            return ["value" => self::formatMoney($amount), 'unit' => ''];
+        $currenciesCodesPrefix = config('currency.currenciesCodesPrefix');
+
+        $amountFormated = self::formatMoneyWithSymbol($amount);
+
+        if (in_array($currencyCode, $currenciesCodesPrefix)) {
+            return $currencySymbol . ' ' . $amountFormated;
+        }
+
+        return $amountFormated . ' ' . $currencySymbol;
+    }
+
+    public static function formatMoneyWithSymbol($amount): string
+    {
+        if ($amount < 1000) {
+            return self::formatMoney($amount);
+        }
 
         $units = ['', 'k', 'M', 'B', 'T'];
         $power = floor(log($amount, 1000));
         $value = $amount / pow(1000, $power);
 
-        return ["value" => self::formatMoney($value), 'unit' => $units[$power]];
+        return self::formatMoney($value) . ' ' . $units[$power];
     }
 
     public static function getOldDate($daysToReduce = 0, $monthsToReduce = 0, $yearsToReduce = 0): DateTime
@@ -54,11 +67,13 @@ class Helpers
 
     public static function getClassByStatus($status)
     {
-        if ($status == "pending")
+        if ($status == "pending") {
             return "warning";
-        else if ($status == "paid" || $status == "completed")
+        } else if ($status == "paid" || $status == "completed") {
             return "success";
-        else
+        } else {
             return "danger";
+        }
+
     }
 }

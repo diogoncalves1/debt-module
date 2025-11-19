@@ -1,5 +1,4 @@
 <?php
-
 namespace Modules\Accounts\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,8 +21,7 @@ class InviteUserAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "user_id" => "required|exists:users,id",
-            "shared_role_id" => "required|exists:shared_roles,id"
+            "shared_role_id" => "required|exists:shared_roles,id",
         ];
     }
 }

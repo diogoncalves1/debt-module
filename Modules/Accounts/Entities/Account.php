@@ -1,21 +1,28 @@
 <?php
-
 namespace Modules\Accounts\Entities;
 
-use App\Casts\Money;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Modules\Currency\Entities\Currency;
+use Modules\SharedRoles\Traits\IsShareable;
 use Modules\User\Entities\User;
 
 class Account extends Model
 {
-    /** @use HasFactory<\Database\Factories\AccountFactory> */
-    use HasFactory;
+    /** @use HasFactory<\Modules\Accounts\Database\Factories\AccountFactory> */
+    use HasFactory, IsShareable;
 
-    protected $table = "accounts";
+    protected $table    = "accounts";
     protected $fillable = ['name', 'type', 'balance', 'currency_id', 'active'];
+    protected $casts    = [
+        'active' => 'bool',
+    ];
+
+    protected static function newFactory()
+    {
+        return \Modules\Accounts\Database\Factories\AccountFactory::new ();
+    }
 
     public function transactions()
     {
@@ -27,7 +34,8 @@ class Account extends Model
     }
     public function users()
     {
-        return $this->belongsToMany(User::class, 'accounts_user', 'account_id', 'user_id')
+        return $this->belongsToMany(User::class, 'account_users', 'account_id', 'user_id')
+            ->using(\Modules\Accounts\Entities\AccountUser::class)
             ->withPivot('shared_role_id');
     }
 
@@ -39,7 +47,10 @@ class Account extends Model
     {
         return $query->where('type', $type);
     }
-
+    public function scopeJoinSharedRoles($query)
+    {
+        return $query->join('shared_roles', 'account_users.shared_role_id', '=', 'shared_roles.id');
+    }
 
     public function creator()
     {
@@ -47,7 +58,6 @@ class Account extends Model
 
         return $this->users()->wherePivot('shared_role_id', $creatorRoleId)->first();
     }
-
 
     public static function getUserAccounts(string $id, array $permissions)
     {

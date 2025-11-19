@@ -1,5 +1,4 @@
 <?php
-
 namespace Modules\Accounts\Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -14,7 +13,8 @@ class AccountsDatabaseSeeder extends Seeder
         $this->call([
             AccountSeeder::class,
             AccountUserSeeder::class,
-            TransactionSeeder::class
+            AccountUserInviteSeeder::class,
+            TransactionSeeder::class,
         ]);
     }
 }

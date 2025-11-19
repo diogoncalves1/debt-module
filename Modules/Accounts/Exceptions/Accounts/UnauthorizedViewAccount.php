@@ -1,6 +1,5 @@
 <?php
-
-namespace Modules\Accounts\Exceptions;
+namespace Modules\Accounts\Exceptions\Accounts;
 
 use Exception;
 
@@ -11,6 +10,6 @@ class UnauthorizedViewAccount extends Exception
 
     public function __construct()
     {
-        parent::__construct(__('exceptions.unauthorizedViewAccount'), $this->code);
+        parent::__construct(__('accounts::exceptions.accounts.unauthorizedViewAccount'), $this->code);
     }
 }

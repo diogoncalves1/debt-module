@@ -1,6 +1,5 @@
 <?php
-
-namespace Modules\Accounts\Exceptions;
+namespace Modules\Accounts\Exceptions\Transactions;
 
 use Exception;
 
@@ -11,6 +10,6 @@ class UnauthorizedUpdateTransactionException extends Exception
 
     public function __construct()
     {
-        parent::__construct(__('exceptions.unauthorizedUpdateTransactionException'), $this->code);
+        parent::__construct(__('accounts::exceptions.transactions.unauthorizedUpdateTransactionException'), $this->code);
     }
 }

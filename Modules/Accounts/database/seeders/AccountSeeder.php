@@ -3,7 +3,6 @@
 namespace Modules\Accounts\Database\Seeders;
 
 use Modules\Accounts\Entities\Account;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class AccountSeeder extends Seeder

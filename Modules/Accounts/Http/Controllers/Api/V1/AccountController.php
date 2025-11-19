@@ -1,53 +1,111 @@
 <?php
-
 namespace Modules\Accounts\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\AppController;
-use Modules\Accounts\Http\Requests\AccountRequest;
-use Modules\Accounts\Repositories\AccountRepository;
+use App\Http\Controllers\ApiController;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Modules\Accounts\DataTables\AccountDataTable;
+use Modules\Accounts\Http\Requests\AccountRequest;
+use Modules\Accounts\Http\Resources\AccountResource;
+use Modules\Accounts\Http\Resources\AccountViewResource;
+use Modules\Accounts\Repositories\AccountRepository;
 
-class AccountController extends AppController
+/**
+ * Finished: True
+ */
+class AccountController extends ApiController
 {
-    private AccountRepository $accountRepository;
+    private AccountRepository $repository;
 
-    public function __construct(AccountRepository $accountRepository)
+    public function __construct(AccountRepository $repository)
     {
-        $this->accountRepository = $accountRepository;
+        $this->repository = $repository;
     }
 
-    public function index(Request $request)
+    /**
+     * Display a listing of the resource.
+     * @param AccountDataTable $dataTable
+     * @return JsonResponse
+     */
+    public function index(AccountDataTable $dataTable)
     {
-        $response = $this->accountRepository->dataTable($request);
-
-        return $response;
+        try {
+            return $dataTable->ajax();
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail($e->getMessage(), $e, $e->getCode());
+        }
     }
 
-    public function show(Request $request, string $id)
+    /**
+     * Store a newly created resource in storage.
+     * @param AccountRequest $request
+     * @return JsonResponse
+     */
+    public function store(AccountRequest $request): JsonResponse
     {
-        $response = $this->accountRepository->showToUser($request, $id);
+        try {
+            $account = $this->repository->store($request);
 
-        return $response;
+            return $this->ok(new AccountResource($account), __('accounts::messages.accounts.store', ['name' => $account->name]));
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail($e->getMessage(), $e, $e->getCode());
+        }
     }
 
-    public function store(AccountRequest $request)
+    /**
+     * Show the specified resource.
+     * @param Request $request
+     * @param string $id
+     * @return JsonResponse
+     */
+    public function show(Request $request, string $id): JsonResponse
     {
-        $response = $this->accountRepository->store($request);
+        try {
+            $account = $this->repository->showToUser($request, $id);
 
-        return $response;
+            return $this->ok(new AccountViewResource($account));
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail($e->getMessage(), $e, $e->getCode());
+        }
     }
 
+    /**
+     * Update the specified resource in storage.
+     * @param AccountRequest $request
+     * @param string $id
+     * @return JsonResponse
+     */
     public function update(AccountRequest $request, string $id)
     {
-        $response = $this->accountRepository->update($request, $id);
+        try {
+            $account = $this->repository->update($request, $id);
 
-        return $response;
+            return $this->ok(new AccountResource($account), __('accounts::messages.accounts.update', ['name' => $account->name]));
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail($e->getMessage(), $e, $e->getCode());
+        }
     }
 
-    public function destroy(Request $request, string $id)
+    /**
+     * Remove the specified resource from storage.
+     * @param Request $request
+     * @param string $id
+     * @return JsonResponse
+     */
+    public function destroy(Request $request, string $id): JsonResponse
     {
-        $response = $this->accountRepository->destroy($request, $id);
+        try {
+            $account = $this->repository->destroy($request, $id);
 
-        return $response;
+            return $this->ok(message: __('accounts::messages.accounts.destroy', ['name' => $account->name]));
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->fail($e->getMessage(), $e, $e->getCode());
+        }
     }
 }
